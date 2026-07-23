@@ -37,7 +37,6 @@ class MainWindow(QMainWindow):
         open_action.triggered.connect(self.open_folder)
 
         toolbar.addSeparator()
-
         toolbar.addAction("🎼 SoundFont")
 
         # Main Area
@@ -45,6 +44,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(body)
 
         self.files = QListWidget()
+        self.files.currentItemChanged.connect(self.show_file_info)
         body.addWidget(self.files, 1)
 
         self.info = QTextEdit()
@@ -85,17 +85,42 @@ class MainWindow(QMainWindow):
         for file in midi_files:
             self.files.addItem(file)
 
+        self.status.setText(f"{len(midi_files)} MIDI files")
+
         self.info.setPlainText(
             f"Folder:\n{folder}\n\n"
             f"MIDI Files Found: {len(midi_files)}"
         )
 
-        self.status.setText(f"{len(midi_files)} MIDI files")
+    def show_file_info(self, current, previous):
+        if current is None:
+            return
+
+        path = current.text()
+
+        size = os.path.getsize(path)
+
+        size_kb = size / 1024
+
+        filename = os.path.basename(path)
+
+        self.info.setPlainText(
+            f"""Filename:
+{filename}
+
+Full Path:
+{path}
+
+Size:
+{size_kb:.1f} KB
+"""
+        )
 
 
 app = QApplication(sys.argv)
 
 window = MainWindow()
+
 window.show()
 
 app.exec()
