@@ -1,6 +1,8 @@
 import os
 import sys
 
+from player import MidiPlayer
+
 from PySide6.QtWidgets import (
     QApplication,
     QFileDialog,
@@ -21,6 +23,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.player = MidiPlayer()
+
         self.setWindowTitle("🎹 MIDI Workbench")
         self.resize(1100, 700)
 
@@ -39,7 +43,6 @@ class MainWindow(QMainWindow):
         toolbar.addSeparator()
         toolbar.addAction("🎼 SoundFont")
 
-        # Main Area
         body = QHBoxLayout()
         layout.addLayout(body)
 
@@ -51,7 +54,6 @@ class MainWindow(QMainWindow):
         self.info.setReadOnly(True)
         body.addWidget(self.info, 2)
 
-        # Bottom Controls
         controls = QHBoxLayout()
         layout.addLayout(controls)
 
@@ -120,10 +122,18 @@ Size:
         )
 
     def play(self):
-        self.status.setText("Play clicked")
+        current = self.files.currentItem()
+
+        if current is None:
+            self.status.setText("No MIDI selected")
+            return
+
+        self.player.play(current.text())
+        self.status.setText("Playing...")
 
     def stop(self):
-        self.status.setText("Stop clicked")
+        self.player.stop()
+        self.status.setText("Stopped")
 
 
 app = QApplication(sys.argv)
