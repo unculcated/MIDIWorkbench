@@ -1,7 +1,9 @@
+import os
 import sys
 
 from PySide6.QtWidgets import (
     QApplication,
+    QFileDialog,
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -17,60 +19,83 @@ from PySide6.QtWidgets import (
 class MainWindow(QMainWindow):
 
     def __init__(self):
-
         super().__init__()
 
         self.setWindowTitle("🎹 MIDI Workbench")
-
-        self.resize(1100,700)
+        self.resize(1100, 700)
 
         central = QWidget()
-
         self.setCentralWidget(central)
 
         layout = QVBoxLayout(central)
 
+        # Toolbar
         toolbar = QToolBar()
-
         self.addToolBar(toolbar)
 
-        toolbar.addAction("📂 Open Folder")
+        open_action = toolbar.addAction("📂 Open Folder")
+        open_action.triggered.connect(self.open_folder)
 
         toolbar.addSeparator()
 
         toolbar.addAction("🎼 SoundFont")
 
+        # Main Area
         body = QHBoxLayout()
-
         layout.addLayout(body)
 
         self.files = QListWidget()
-
-        body.addWidget(self.files)
+        body.addWidget(self.files, 1)
 
         self.info = QTextEdit()
-
         self.info.setReadOnly(True)
+        body.addWidget(self.info, 2)
 
-        body.addWidget(self.info)
-
+        # Bottom Controls
         controls = QHBoxLayout()
-
         layout.addLayout(controls)
 
         controls.addWidget(QPushButton("▶ Play"))
-
         controls.addWidget(QPushButton("■ Stop"))
-
         controls.addStretch()
 
-        controls.addWidget(QLabel("Ready"))
+        self.status = QLabel("Ready")
+        controls.addWidget(self.status)
+
+    def open_folder(self):
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Choose MIDI Folder"
+        )
+
+        if not folder:
+            return
+
+        self.files.clear()
+
+        midi_files = []
+
+        for root, dirs, files in os.walk(folder):
+            for file in files:
+                if file.lower().endswith((".mid", ".midi")):
+                    midi_files.append(os.path.join(root, file))
+
+        midi_files.sort()
+
+        for file in midi_files:
+            self.files.addItem(file)
+
+        self.info.setPlainText(
+            f"Folder:\n{folder}\n\n"
+            f"MIDI Files Found: {len(midi_files)}"
+        )
+
+        self.status.setText(f"{len(midi_files)} MIDI files")
 
 
 app = QApplication(sys.argv)
 
 window = MainWindow()
-
 window.show()
 
 app.exec()
