@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         toolbar.addSeparator()
         toolbar.addAction("🎼 SoundFont")
 
+        # Main Area
         body = QHBoxLayout()
         layout.addLayout(body)
 
@@ -54,6 +55,7 @@ class MainWindow(QMainWindow):
         self.info.setReadOnly(True)
         body.addWidget(self.info, 2)
 
+        # Bottom Controls
         controls = QHBoxLayout()
         layout.addLayout(controls)
 
@@ -71,9 +73,12 @@ class MainWindow(QMainWindow):
         controls.addWidget(self.status)
 
     def open_folder(self):
+        default_folder = "/Users/ss/Downloads/MYMIDI"
+
         folder = QFileDialog.getExistingDirectory(
             self,
-            "Choose MIDI Folder"
+            "Choose MIDI Folder",
+            default_folder,
         )
 
         if not folder:
@@ -105,6 +110,7 @@ class MainWindow(QMainWindow):
             return
 
         path = current.text()
+
         size = os.path.getsize(path)
         size_kb = size / 1024
         filename = os.path.basename(path)
@@ -139,6 +145,7 @@ Size:
 app = QApplication(sys.argv)
 
 window = MainWindow()
+
 window.show()
 
 app.exec()

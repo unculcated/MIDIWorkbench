@@ -1,5 +1,7 @@
 import subprocess
 
+from settings import load_settings
+
 
 class MidiPlayer:
     def __init__(self):
@@ -8,7 +10,8 @@ class MidiPlayer:
     def play(self, midi_file):
         self.stop()
 
-        soundfont = "/Users/ss/Downloads/GeneralUser-GS/GeneralUser-GS.sf2"
+        settings = load_settings()
+        soundfont = settings["soundfont"]
 
         self.process = subprocess.Popen([
             "fluidsynth",
