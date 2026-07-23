@@ -55,8 +55,14 @@ class MainWindow(QMainWindow):
         controls = QHBoxLayout()
         layout.addLayout(controls)
 
-        controls.addWidget(QPushButton("▶ Play"))
-        controls.addWidget(QPushButton("■ Stop"))
+        self.play_button = QPushButton("▶ Play")
+        self.play_button.clicked.connect(self.play)
+        controls.addWidget(self.play_button)
+
+        self.stop_button = QPushButton("■ Stop")
+        self.stop_button.clicked.connect(self.stop)
+        controls.addWidget(self.stop_button)
+
         controls.addStretch()
 
         self.status = QLabel("Ready")
@@ -97,11 +103,8 @@ class MainWindow(QMainWindow):
             return
 
         path = current.text()
-
         size = os.path.getsize(path)
-
         size_kb = size / 1024
-
         filename = os.path.basename(path)
 
         self.info.setPlainText(
@@ -116,11 +119,16 @@ Size:
 """
         )
 
+    def play(self):
+        self.status.setText("Play clicked")
+
+    def stop(self):
+        self.status.setText("Stop clicked")
+
 
 app = QApplication(sys.argv)
 
 window = MainWindow()
-
 window.show()
 
 app.exec()
